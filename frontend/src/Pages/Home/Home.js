@@ -18,7 +18,7 @@ function Home() {
                 </Estilo>
                 <BotaoHome>
                     <Button colorScheme='gray' variant='outline' fontSize='20px' color='white'>
-                        <Link to='/Login'>
+                        <Link to='/login'>
                             COMEÇAR
                         </Link>
                     </Button>

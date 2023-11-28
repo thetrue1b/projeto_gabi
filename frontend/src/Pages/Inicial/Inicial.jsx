@@ -6,7 +6,6 @@ export const Fundo = styled.div`
     min-width: 100vw;
     min-height: 100vh;
     justify-content: center;
-     /* background-color: yellow; */
     padding-top: 12vh;
 `
 export const Estilização = styled.div`
@@ -45,4 +44,10 @@ export const EstilizaçãoB = styled.button`
     margin-top: -19px;
     
 `
-
+export const S = styled.div`
+    margin-left: 1px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+`

@@ -6,8 +6,7 @@ import { Imagem} from './Cadastro.jsx'
 import { Titulo } from './Cadastro.jsx'
 import { Estilização } from './Cadastro.jsx'
 import { Button } from '@chakra-ui/react'
-import { BotaoCadastro } from './Cadastro.jsx'
-import { Link } from 'react-router-dom'
+import { BotaoCadastro } from './Cadastro.jsx';
 import { useNavigate } from "react-router-dom";
 import React, {useState} from "react";
 import { baseUrl } from "../../services/api";

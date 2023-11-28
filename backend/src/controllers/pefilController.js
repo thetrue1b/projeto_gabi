@@ -1,75 +1,34 @@
-/**
- INFORMAÇÕES DO CONTROLLER
-
- 1. Executa funções assíncronas que retornam uma Promise que é resolvida com um valor de retorno;
- 2. Parâmetro request (requisição): é o pedido que um cliente (usuário) realiza a nosso servidor;
- 3. Parâmetro response (resposta): é a resosta que o servidor envia ao cliente (usuário);
- 4. Com a variável connection que possui as configurações do banco de dados, utilizamos a função query para realizar os comandos de gerenciamento do banco de dados;
- 5. Validamos o retorno da requisição, caso tenha algum erro
- 6. Retornamos as informações em formato JSON com chaves e valores para o client
- 7. Try/Catch: utilizado para tratar erros que podem acontecer dentro do sistema
-
-*/
-
 // Importa as configurações do banco de dados na variável connection
 const connection = require('../config/db');
 
 // Pacote para criptografar a senha de usuario
 const bcrypt = require('bcrypt');
 
-// Função que retorna todos usuários no banco de dados
-async function listUsers(request, response) {
-    // Preparar o comando de execução no banco
-    connection.query('SELECT * FROM usuarios', (resultserr, ) => { 
-        try {  // Tenta retornar as solicitações requisitadas
-            if (results) {  // Se tiver conteúdo 
-                response.status(200).json({
-                    success: true,
-                    message: 'Retorno de usuarios com sucesso!',
-                    data: results
-                });
-            } else {  // Retorno com informações de erros
-                response
-                    .status(400)
-                    .json({
-                        success: false,
-                        message: `Não foi possível retornar os usuários.`,
-                        query: err.sql,
-                        sqlMessage: err.sqlMessage
-                    });
-            }
-        } catch (e) {  // Caso aconteça qualquer erro no processo na requisição, retorna uma mensagem amigável
-            response.status(400).json({
-                succes: false,
-                message: "Ocorreu um erro. Não foi possível realizar sua requisição!",
-                query: err.sql,
-                sqlMessage: err.sqlMessage
-            })
-        }   
-    });
-}
+// cria os post no banco de dados
 
-// Função que cria um novo usuário (pontos de interroga~ção = variaveis)
-async function storeUser(request, response) {
-    // Preparar o comando de execução no banco
-    const query = 'INSERT INTO usuarios(nome, senha, email) VALUES(?, ?, ?);';
-
-    // Recuperar os dados enviados na requisição
+async function storePost(request, response) {
+// Recuperar os dados enviados na requisição
+// Preparar o comando de execução no banco
+    const query = 'INSERT INTO perfil(user_id, img_perfil_) VALUES(?, ?);';
+    console.log(request.body)
     const params = Array(
-        request.body.nome,
-        bcrypt.hashSync(request.body.senha, 3),
-        request.body.email
-    );
-
+        request.body.user_id,
+        request.file.filename,
+        request.body.legenda_post
+    )
+    console.log(params)
+    
     // Executa a ação no banco e valida os retornos para o client que realizou a solicitação
     connection.query(query, params, (err, results) => {
+        console.log('e ' + err)
+        console.log('r ' + results)
         try {
             if (results) {
                 response
                     .status(201)
                     .json({
                         success: true,
-                        message: `Sucesso! Usuário cadastrado.`,
+                        message: `Postagem cadastrada com sucesso!.`,
                         data: results
                     });
             } else {
@@ -77,7 +36,7 @@ async function storeUser(request, response) {
                     .status(400)
                     .json({
                         success: false,
-                        message: `Não foi possível realizar o cadastro. Verifique os dados informados`,
+                        message: `Não foi possível realizar a postagem. Verifique os dados informados`,
                         query: err.sql,
                         sqlMessage: err.sqlMessage
                     });
@@ -85,7 +44,7 @@ async function storeUser(request, response) {
         } catch (e) { // Caso aconteça algum erro na execução
             response.status(400).json({
                     succes: false,
-                    message: "Ocorreu um erro. Não foi possível cadastrar usuário!",
+                    message: "Ocorreu um erro. Não foi possível postar",
                     query: err.sql,
                     sqlMessage: err.sqlMessage
                 });
@@ -93,15 +52,32 @@ async function storeUser(request, response) {
     });
 }
 
+async function posts(request, response) {
+    const query = 'SELECT * FROM posts;';
+    
+    connection.query(query, (err, results) => {
+        if (results) {
+            response
+                .status(200)
+                .json({
+                    success: true,
+                    message: "Dados de posts",
+                    data: results
+                });
+        }
+    })
+}
+
 // Função que atualiza o usuário no banco
 async function updateUser(request, response) {
     // Preparar o comando de execução no banco
-    const query = "UPDATE usuarios SET `nome` = ?, `imagem` = ? WHERE `id` = ?";
-    
+    const query = "UPDATE usuarios SET `nome` = ?, `senha` = ?, `fl_status` = ? WHERE `id` = ?";
+
     // Recuperar os dados enviados na requisição respectivamente
     const params = Array(
         request.body.nome,
-        request.file.filename,
+        bcrypt.hashSync(request.body.senha, 10),
+        request.body.fl_status,
         request.params.id  // Recebimento de parametro da rota
     );
 
@@ -113,7 +89,7 @@ async function updateUser(request, response) {
                     .status(200)
                     .json({
                         success: true,
-                        message: `Sucesso! Usuário atualizado.`,
+                        message: `Sucesso!`,
                         data: results
                     });
             } else {
@@ -121,7 +97,7 @@ async function updateUser(request, response) {
                     .status(400)
                     .json({
                         success: false,
-                        message: `Não foi possível realizar a atualização. Verifique os dados informados`,
+                        message: `Não foi possível realizar a postagem!`,
                         query: err.sql,
                         sqlMessage: err.sqlMessage
                     });
@@ -129,7 +105,7 @@ async function updateUser(request, response) {
         } catch (e) { // Caso aconteça algum erro na execução
             response.status(400).json({
                     succes: false,
-                    message: "Ocorreu um erro. Não foi possível atualizar usuário!",
+                    message: "Ocorreu um erro!",
                     query: err.sql,
                     sqlMessage: err.sqlMessage
                 });
@@ -163,7 +139,7 @@ async function deleteUser(request, response) {
                     .status(400)
                     .json({
                         success: false,
-                        message: `Não foi possível realizar a remoção. Verifique os dados informados`,
+                        message: `Verifique os dados informados`,
                         query: err.sql,
                         sqlMessage: err.sqlMessage
                     });
@@ -171,7 +147,7 @@ async function deleteUser(request, response) {
         } catch (e) { // Caso aconteça algum erro na execução
             response.status(400).json({
                     succes: false,
-                    message: "Ocorreu um erro. Não foi possível deletar usuário!",
+                    message: "Ocorreu um erro!",
                     query: err.sql,
                     sqlMessage: err.sqlMessage
                 });
@@ -180,8 +156,8 @@ async function deleteUser(request, response) {
 }
 
 module.exports = {
-    listUsers,
-    storeUser,
+    storePost,
     updateUser,
-    deleteUser
+    deleteUser,
+    posts
 }

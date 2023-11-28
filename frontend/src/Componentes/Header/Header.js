@@ -3,19 +3,27 @@ import { HeaderContainer } from "./Header.jsx"
 // import { HeaderContainer } from "./Header.jsx"
 import { SearchIcon } from '@chakra-ui/icons'
 import { IconButton } from "@chakra-ui/button"
-import { Flex, Input, InputGroup, InputLeftElement, InputRightElement, Stack } from '@chakra-ui/react'
+import { Flex, Input, InputGroup, InputLeftElement, Stack } from '@chakra-ui/react'
+import { useState } from "react"
+
+
+
 
 
 function Header() {
+    // const [filtroBuscaPorNome, setFiltroBuscaPorNome] = useState("");
+    // const filtroDeUsuario = ()=>{
+    //     const usuarioFiltrados = 
+    //     .filter((item)=>{
+    //       return item.name.includes(filtroBuscaPorNome)
+    //     })
+    //     return usuarioFiltrados;
+    //   }
+  
+    //   const filtrados = filtroDeUsuario();
+     
     return (
         <>
-
-            {/* <Estilização>
-                    <MesmaLinha>
-                        <Input placeholder='Pesquisar' size='sm' />
-                        <IconButton aria-label='Search database' icon={<SearchIcon />} />
-                    </MesmaLinha>
-                </Estilização> */}
 
             <HeaderContainer>
                 <Flex>
@@ -28,7 +36,7 @@ function Header() {
                                 pointerEvents='none'                            >
                                 <IconButton aria-label='Search database' icon={<SearchIcon />} />
                             </InputLeftElement>
-                            <Input type='tel' _placeholder={{ color: 'White' }} placeholder=' Pesquisar' />
+                            <Input type='tel' _placeholder={{ color: 'White' }} placeholder=' Pesquisa' />
                         </InputGroup>
                     </Stack>
                 </Flex>

@@ -6,12 +6,12 @@ require("dotenv").config();
 const bcrypt = require('bcrypt');
 // Importar pacote que implementa o protocolo JSON Web Token
 const jwt = require('jsonwebtoken');
-
+ 
 // Authentication
 async function login(request, response) {
     // Preparar o comando de execução no banco
-    const query = "SELECT * FROM users WHERE `email` = ?";
-    
+    const query = "SELECT * FROM usuarios WHERE `email` = ?";
+   
     // Recuperar credenciais informadas
     const params = Array(
         request.body.email
@@ -21,26 +21,36 @@ async function login(request, response) {
     connection.query(query, params, (err, results) => {
         try {            
             if (results.length > 0) {                
-                bcrypt.compare(request.body.password, results[0].password, (err, result) => {
+                bcrypt.compare(request.body.senha, results[0].senha, (err, result) => {
                     if (err) {                        
                         return response.status(401).send({
-                          msg: 'Email or password is incorrect!'
+                            msg: 'Email or password is incorrect!'
                         });
                     } else if(result) {
-                        const id = results[0].id_user;
+                        const id = results[0].id;
                         const token = jwt.sign({ userId: id },'the-super-strong-secrect',{ expiresIn: 300 });
-                        results[0]['token'] = token; 
-                        
+                        results[0]['token'] = token;
+                       
                         response
                         .status(200)
                         .json({
                             success: true,
                             message: `Sucesso! Usuário conectado.`,
                             data: results
+                            //me retorna o token que esta no results, pra locar no meu localstorage (esse
+                            // localstorage está no frontend de login)
+                            //também vai precisar do ID que está no resultus  
+                            // Precisamo fazer isso, pq depois que entrarmos na plataforma precisaremos puxar os dados desse usuário
+                            // ex: o nome para postar as coisas, tudo seirão do localstorage
+                        });
+                    } else {
+                        // Senha incorreta
+                        response.status(401).send({
+                            msg: 'Email ou senha incorretos!'
                         });
                     }
                 })
-                
+               
             } else {
                 response
                     .status(400)
@@ -54,14 +64,15 @@ async function login(request, response) {
         } catch (e) { // Caso aconteça algum erro na execução
             response.status(400).json({
                     succes: false,
-                    message: "Ocorreu um erro. Não foi possível deletar usuário!",
+                    message: "Ocorreu um erro. Não foi possível logar o usuário!",
                     query: err,
                     sqlMessage: err
                 });
         }
     });
 }
-
+ 
+ 
 module.exports = {
     login
 }
